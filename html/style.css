@@ -1,0 +1,87 @@
+h2 {
+  margin: 10px 0;
+}
+
+.section {
+  margin: 10px;
+}
+
+textarea {
+  width: 100%;
+  height: 200px;
+  padding: 10px;
+  border-radius: 5px;
+  resize: vertical;
+  font-family: monospace;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+textarea.drag-over {
+  border-color: #28a745;
+  background-color: #f0fff0;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.table-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.data-table th {
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+.data-table tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.data-table tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+.data-table td.null-value {
+  color: #999;
+  font-style: italic;
+}
+
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}
