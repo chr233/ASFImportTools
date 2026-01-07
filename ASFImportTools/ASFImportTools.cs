@@ -12,7 +12,7 @@ using System.Text.Json;
 namespace ASFImportTools;
 
 [Export(typeof(IPlugin))]
-internal sealed class ASFImportTools : IASF, IBotCommand2, IGitHubPluginUpdates, IWebInterface
+internal sealed class ASFImportTools : IASF, IBotCommand2, IGitHubPluginUpdates
 {
     private const string ShortName = "AIT";
 
@@ -31,10 +31,6 @@ internal sealed class ASFImportTools : IASF, IBotCommand2, IGitHubPluginUpdates,
 
     public bool CanUpdate => true;
     public string RepositoryName => "chr233/ASFImportTools";
-
-    public string PhysicalPath => "ASFImportTools";
-
-    public string WebPath => "/Import";
 
     /// <summary>
     /// ASF启动事件
