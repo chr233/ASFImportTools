@@ -19,64 +19,47 @@ public sealed class ImportController : ArchiController
     /// 获取账号信息
     /// </summary>
     /// <returns></returns>
-    [HttpPost]
+    [HttpGet("{botNames:required}")]
     [EndpointSummary("获取账号信息")]
-    public ActionResult<GenericResponse<Dictionary<string, BotSummaryData>>> GetBotSummaryList()
+    public ActionResult<GenericResponse<Dictionary<string, BotSummaryData>>> GetBotList([FromRoute] string botNames = "ASF")
     {
         if (!Config.EULA)
         {
             return Ok(new GenericResponse(false, Langs.EulaNotConfirmed));
         }
 
-        if (Bot.BotsReadOnly == null)
+        var bots = Bot.GetBots(botNames);
+        if (bots == null)
         {
             return Ok(new GenericResponse(false, Langs.InternalError));
         }
 
         Dictionary<string, BotSummaryData> response = [];
 
-        foreach (var (botName, bot) in Bot.BotsReadOnly)
+        foreach (var bot in bots)
         {
-            BotSummaryData summary;
-
             var walletBalance = Convert.ToDecimal(bot.WalletBalance) / 100;
 
-            if (bot.IsConnectedAndLoggedOn)
+            var summary = new BotSummaryData
             {
-                summary = new BotSummaryData
-                {
-                    BotName = botName,
-                    NickName = bot.Nickname,
-                    AccountName = bot.BotConfig.SteamLogin,
-                    IsLimit = bot.IsAccountLimited,
-                    Has2Fa = bot.HasMobileAuthenticator,
-                    Enabled = bot.BotConfig.Enabled,
-                    Paused = bot.CardsFarmer.Paused,
-                    IsOnline = bot.IsConnectedAndLoggedOn,
-                    SteamId = bot.SteamID,
-                    WalletBalance = walletBalance.ToString(CultureInfo.CurrentCulture),
-                    WalletCurrency = bot.WalletCurrency.ToString()
-                };
-            }
-            else
-            {
-                summary = new BotSummaryData
-                {
-                    BotName = botName,
-                    NickName = bot.Nickname,
-                    AccountName = bot.BotConfig.SteamLogin,
-                    IsLimit = bot.IsAccountLimited,
-                    Has2Fa = bot.HasMobileAuthenticator,
-                    Enabled = bot.BotConfig.Enabled,
-                    Paused = bot.CardsFarmer.Paused,
-                    IsOnline = bot.IsConnectedAndLoggedOn,
-                    SteamId = bot.SteamID,
-                    WalletBalance = walletBalance.ToString(CultureInfo.CurrentCulture),
-                    WalletCurrency = null,
-                };
-            }
+                BotName = bot.BotName,
+                NickName = bot.Nickname,
+                AccountFlags = bot.AccountFlags,
+                AvatarHash = bot.AvatarHash,
+                PublishIP = bot.PublicIP,
+                IsLimited = bot.IsAccountLimited,
+                IsLocked = bot.IsAccountLocked,
+                Has2Fa = bot.HasMobileAuthenticator,
+                Enabled = bot.BotConfig.Enabled,
+                Paused = bot.CardsFarmer.Paused,
+                KeepRunning = bot.KeepRunning,
+                IsOnline = bot.IsConnectedAndLoggedOn,
+                SteamId = bot.SteamID,
+                WalletBalance = walletBalance.ToString(CultureInfo.CurrentCulture),
+                WalletCurrency = bot.WalletCurrency.ToString()
+            };
 
-            response.TryAdd(botName, summary);
+            response.TryAdd(bot.BotName, summary);
         }
 
         return Ok(new GenericResponse<Dictionary<string, BotSummaryData>>(true, "ok", response));
@@ -89,7 +72,7 @@ public sealed class ImportController : ArchiController
     /// <returns></returns>
     [HttpPost]
     [EndpointSummary("批量导入账号")]
-    public async Task<ActionResult<GenericResponse<Dictionary<string, ImportResultData>>>> ImportAccounts(
+    public async Task<ActionResult<GenericResponse<Dictionary<string, ImportResultData>>>> ImportBots(
         [FromBody] List<ImportAccountsData> accounts, [FromQuery] bool allowReplace)
     {
         if (!Config.EULA)

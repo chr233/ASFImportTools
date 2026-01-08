@@ -1,3 +1,6 @@
 [submodule "ArchiSteamFarm"]
 	path = ArchiSteamFarm
 	url = https://github.com/JustArchiNET/ArchiSteamFarm.git
+[submodule "asf-import-tools"]
+	path = asf-import-tools
+	url = https://github.com/chr233/asf-import-tools
