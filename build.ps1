@@ -1,10 +1,7 @@
-$PROJECT_NAME = "ASFEnhance"
-$PLUGIN_NAME = "ASFEnhance.dll"
-$PROJECT_NAME2 = "ASFEnhance.IPC"
-$PLUGIN_NAME2 = "ASFEnhance.IPC.dll"
+$PROJECT_NAME = "ASFImportTools"
+$PLUGIN_NAME = "ASFImportTools.dll"
 
 dotnet publish $PROJECT_NAME -o ./publish/ -c Release
-dotnet publish $PROJECT_NAME2 -o ./publish/IPC/ -c Release
 
 
 if (-Not (Test-Path -Path ./dist)) {
@@ -15,7 +12,6 @@ else {
 }
 
 Copy-Item -Path .\publish\$PLUGIN_NAME -Destination .\dist\ 
-Copy-Item -Path .\publish\IPC\$PLUGIN_NAME2 -Destination .\dist\ 
 
 $dirs = Get-ChildItem -Path ./publish -Directory
 foreach ($dir in $dirs) {
