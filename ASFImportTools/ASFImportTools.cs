@@ -3,6 +3,7 @@ using ArchiSteamFarm.Helpers.Json;
 using ArchiSteamFarm.Plugins.Interfaces;
 using ArchiSteamFarm.Steam;
 using ASFImportTools.Data.Plugin;
+using ASFImportTools.IPC;
 using System.ComponentModel;
 using System.Composition;
 using System.Reflection;
@@ -76,6 +77,10 @@ internal sealed class ASFImportTools : IASF, IBotCommand2, IGitHubPluginUpdates
             sb.AppendLine(Langs.Line);
             sb.AppendLineFormat(Langs.EulaWarning, Name);
             sb.AppendLine(Langs.Line);
+        }
+        else
+        {
+            FrontentController.SetupApi();
         }
 
         if (sb.Length > 0)

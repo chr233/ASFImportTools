@@ -69,6 +69,7 @@ public sealed class ImportController : ArchiController
     /// 批量导入账号
     /// </summary>
     /// <param name="accounts"></param>
+    /// <param name="allowReplace"></param>
     /// <returns></returns>
     [HttpPost]
     [EndpointSummary("批量导入账号")]
@@ -98,14 +99,13 @@ public sealed class ImportController : ArchiController
             {
                 if (!allowReplace)
                 {
-                    result = new ImportResultData(item.BotName, true, "Bot已存在，跳过更新");
+                    result = new ImportResultData(item.BotName, true, oldBot.HasMobileAuthenticator, "Bot已存在，跳过更新");
                 }
                 else
                 {
                     updatedBotNames.Add(item.BotName);
 
-                    if (!oldBot.HasMobileAuthenticator && !string.IsNullOrEmpty(item.IdentitySecret) &&
-                        !string.IsNullOrEmpty(item.SharedSecret))
+                    if (!oldBot.HasMobileAuthenticator && !string.IsNullOrEmpty(item.IdentitySecret) && !string.IsNullOrEmpty(item.SharedSecret))
                     {
                         if (oldBot.IsConnectedAndLoggedOn)
                         {
@@ -113,37 +113,37 @@ public sealed class ImportController : ArchiController
                         }
 
                         var success =
-                            await CreateOrUpdateBotDbFile(item.BotName, item.IdentitySecret, item.SharedSecret)
-                                .ConfigureAwait(false);
+                            await CreateOrUpdateBotDbFile(item.BotName, item.IdentitySecret, item.SharedSecret).ConfigureAwait(false);
 
-                        result = new ImportResultData(item.BotName, success, success ? "Bot更新成功" : "更新Bot令牌信息失败");
+                        result = new ImportResultData(item.BotName, success, success, success ? "Bot更新成功" : "更新Bot令牌信息失败");
                     }
                     else
                     {
-                        result = new ImportResultData(item.BotName, true, "Bot已存在，已更新发货类型");
+                        result = new ImportResultData(item.BotName, true, oldBot.HasMobileAuthenticator, "Bot已存在, 无需更新");
                     }
                 }
             }
             else
             {
-                if (!string.IsNullOrEmpty(item.SteamLogin) && !string.IsNullOrEmpty(item.SteamPassword) &&
-                    !string.IsNullOrEmpty(item.IdentitySecret) && !string.IsNullOrEmpty(item.SharedSecret))
+                if (!string.IsNullOrEmpty(item.SteamLogin) && !string.IsNullOrEmpty(item.SteamPassword))
                 {
-                    var addDbSuccess =
-                        await CreateOrUpdateBotDbFile(item.BotName, item.IdentitySecret, item.SharedSecret)
-                            .ConfigureAwait(false);
+                    var addDbSuccess = false;
+                    if (!string.IsNullOrEmpty(item.IdentitySecret) && !string.IsNullOrEmpty(item.SharedSecret))
+                    {
+                        addDbSuccess =
+                     await CreateOrUpdateBotDbFile(item.BotName, item.IdentitySecret, item.SharedSecret).ConfigureAwait(false);
+                    }
 
                     var addBotSuccess = await CreateBotConfigFile(item.BotName, item.SteamLogin, item.SteamPassword,
-                            item.Enabled, item.Paused, BotConfig.EBotBehaviour.DismissInventoryNotifications)
-                        .ConfigureAwait(false);
+                            item.Enabled, item.Paused, BotConfig.EBotBehaviour.DismissInventoryNotifications).ConfigureAwait(false);
 
                     var success = addBotSuccess && addDbSuccess;
 
-                    result = new ImportResultData(item.BotName, success, success ? "创建Bot成功" : "创建Bot失败");
+                    result = new ImportResultData(item.BotName, success, addDbSuccess, success ? "创建Bot成功" : "创建Bot失败");
                 }
                 else
                 {
-                    result = new ImportResultData(item.BotName, false, "缺少登录信息，无法创建Bot");
+                    result = new ImportResultData(item.BotName, false, false, "缺少登录信息，无法创建Bot");
                 }
             }
 
