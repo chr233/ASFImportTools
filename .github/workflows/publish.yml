@@ -106,3 +106,7 @@ jobs:
             ---
 
             release created by github actions
+
+            ---
+
+            前端入口 `http://localhost:1242` (假设 ASF IPC 接口在 http://localhost:1242)
