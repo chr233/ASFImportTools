@@ -8,7 +8,7 @@ namespace ASFImportTools.IPC;
 /// <summary>
 /// 测试相关接口
 /// </summary>
-public sealed class FrontentController : ArchiController
+public sealed class FrontendController : ArchiController
 {
     private static HttpClient? _httpClient;
 
@@ -24,7 +24,6 @@ public sealed class FrontentController : ArchiController
     /// <summary>
     /// 
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <param name="path"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
@@ -35,9 +34,9 @@ public sealed class FrontentController : ArchiController
             return null;
         }
 
-        var response = await _httpClient.GetAsync(path, cancellationToken).ConfigureAwait(false);
         try
         {
+            var response = await _httpClient.GetAsync(path, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
             var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
             var payload = System.Text.Encoding.UTF8.GetString(bytes);
@@ -52,11 +51,11 @@ public sealed class FrontentController : ArchiController
     }
 
     /// <summary>
-    /// 获取账号信息
+    /// 导入账号信息
     /// </summary>
     /// <returns></returns>
     [HttpGet("/Import")]
-    [EndpointSummary("获取账号信息")]
+    [EndpointSummary("导入账号信息")]
     public async Task<ActionResult> Index()
     {
         if (_httpClient == null)
@@ -75,15 +74,13 @@ public sealed class FrontentController : ArchiController
         }
     }
 
-    //[HttpGet("/Import/_app/")]
-    //public ActionResult Resource(string path)
-    //{
-    //    if (_httpClient == null)
-    //    {
-    //        return Ok("");
-    //    }
-
-    //    var response = await GetToString("/").ConfigureAwait(false);
-    //    return Content(response ?? Langs.NetworkError);
-    //}
+    /// <summary>
+    /// 获取图标
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("/favicon.{extension:required}")]
+    public async Task<ActionResult> Favicon(string extension)
+    {
+        return RedirectPermanent($"https://import.chrxw.com/favicon.{extension}");
+    }
 }

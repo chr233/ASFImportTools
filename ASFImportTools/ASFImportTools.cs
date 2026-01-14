@@ -80,7 +80,7 @@ internal sealed class ASFImportTools : IASF, IBotCommand2, IGitHubPluginUpdates
         }
         else
         {
-            FrontentController.SetupApi();
+            FrontendController.SetupApi();
         }
 
         if (sb.Length > 0)
