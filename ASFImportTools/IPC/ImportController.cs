@@ -128,10 +128,10 @@ public sealed class ImportController : ArchiController
                 if (!string.IsNullOrEmpty(item.SteamLogin) && !string.IsNullOrEmpty(item.SteamPassword))
                 {
                     var addDbSuccess = false;
-                    if (!string.IsNullOrEmpty(item.IdentitySecret) && !string.IsNullOrEmpty(item.SharedSecret))
+                    if (!string.IsNullOrEmpty(item.SharedSecret))
                     {
                         addDbSuccess =
-                     await CreateOrUpdateBotDbFile(item.BotName, item.IdentitySecret, item.SharedSecret).ConfigureAwait(false);
+                     await CreateOrUpdateBotDbFile(item.BotName, item.IdentitySecret , item.SharedSecret).ConfigureAwait(false);
                     }
 
                     var addBotSuccess = await CreateBotConfigFile(item.BotName, item.SteamLogin, item.SteamPassword,

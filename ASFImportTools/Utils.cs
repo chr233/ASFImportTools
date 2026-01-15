@@ -2,7 +2,6 @@ using ArchiSteamFarm.Core;
 using ArchiSteamFarm.Helpers.Json;
 using ArchiSteamFarm.NLog;
 using ArchiSteamFarm.Steam;
-using ArchiSteamFarm.Steam.Integration;
 using ASFImportTools.Data.IPC;
 using ASFImportTools.Data.Plugin;
 using System.Reflection;
@@ -122,7 +121,7 @@ internal static class Utils
     /// <param name="identitySecret"></param>
     /// <param name="sharedSecret"></param>
     /// <returns></returns>
-    internal static async Task<bool> CreateOrUpdateBotDbFile(string botName, string identitySecret, string sharedSecret)
+    internal static async Task<bool> CreateOrUpdateBotDbFile(string botName, string? identitySecret, string sharedSecret)
     {
         try
         {
@@ -141,7 +140,7 @@ internal static class Utils
                     MobileAuthenticator = new SecretData
                     {
                         SharedSecret = sharedSecret,
-                        IdentitySecret = identitySecret,
+                        IdentitySecret = identitySecret ?? "",
                     }
                 };
             }
