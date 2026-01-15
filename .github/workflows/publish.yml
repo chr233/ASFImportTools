@@ -47,6 +47,8 @@ jobs:
           npm run-script generateInfo --no-progress --prefix ${{ env.UI_NAME }}
           npm run-script build --no-progress --prefix ${{ env.UI_NAME }}
 
+          
+
       - name: Upload ${{ env.UI_NAME }}
         uses: actions/upload-artifact@v6.0.0
         with:
@@ -96,7 +98,7 @@ jobs:
           }
 
           Copy-Item -Path .\publish\${{ env.PLUGIN_NAME }} -Destination .\tmp\ 
-          Copy-Item -Path .\publish\ui\* -Destination .\tmp\${{ env.PROJECT_NAME }}.www -Recurse
+          Copy-Item -Path .\publish\ui\ -Destination .\tmp\${{ env.PROJECT_NAME }}.www -Recurse
 
           $dirs = Get-ChildItem -Path ./publish -Directory
           foreach ($dir in $dirs) {
