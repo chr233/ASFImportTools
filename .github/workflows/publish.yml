@@ -96,7 +96,7 @@ jobs:
           }
 
           Copy-Item -Path .\publish\${{ env.PLUGIN_NAME }} -Destination .\tmp\ 
-          Copy-Item -Path .\publish\ui\* -Destination .\tmp\${{ env.PLUGIN_NAME }}.www -Recurse
+          Copy-Item -Path .\publish\ui\* -Destination .\tmp\${{ env.PROJECT_NAME }}.www -Recurse
 
           $dirs = Get-ChildItem -Path ./publish -Directory
           foreach ($dir in $dirs) {
