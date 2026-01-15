@@ -12,7 +12,7 @@ namespace ASFImportTools.IPC;
 /// <summary>
 /// 测试相关接口
 /// </summary>
-[Route("/Api/[controller]/[action]")]
+[Route("/Api/Import")]
 public sealed class ImportController : ArchiController
 {
     /// <summary>
@@ -21,7 +21,7 @@ public sealed class ImportController : ArchiController
     /// <returns></returns>
     [HttpGet("{botNames:required}")]
     [EndpointSummary("获取账号信息")]
-    public ActionResult<GenericResponse<Dictionary<string, BotSummaryData>>> GetBotList([FromRoute] string botNames = "ASF")
+    public ActionResult GetBotList(string botNames = "ASF")
     {
         if (!Config.EULA)
         {
@@ -73,7 +73,7 @@ public sealed class ImportController : ArchiController
     /// <returns></returns>
     [HttpPost]
     [EndpointSummary("批量导入账号")]
-    public async Task<ActionResult<GenericResponse<Dictionary<string, ImportResultData>>>> ImportBots(
+    public async Task<ActionResult> ImportBots(
         [FromBody] List<ImportAccountsData> accounts, [FromQuery] bool allowReplace)
     {
         if (!Config.EULA)
@@ -131,7 +131,7 @@ public sealed class ImportController : ArchiController
                     if (!string.IsNullOrEmpty(item.SharedSecret))
                     {
                         addDbSuccess =
-                     await CreateOrUpdateBotDbFile(item.BotName, item.IdentitySecret , item.SharedSecret).ConfigureAwait(false);
+                     await CreateOrUpdateBotDbFile(item.BotName, item.IdentitySecret, item.SharedSecret).ConfigureAwait(false);
                     }
 
                     var addBotSuccess = await CreateBotConfigFile(item.BotName, item.SteamLogin, item.SteamPassword,

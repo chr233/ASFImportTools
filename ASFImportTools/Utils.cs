@@ -13,7 +13,7 @@ namespace ASFImportTools;
 internal static class Utils
 {
     internal const StringSplitOptions SplitOptions =
-        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
+    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
 
     /// <summary>
     ///     插件配置
