@@ -37,7 +37,6 @@
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="..\ArchiSteamFarm\ArchiSteamFarm\bin\$(Configuration)\$(TargetFramework)\plugins\" SkipUnchangedFiles="true" />
-		<Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\Users\ASUS\Downloads\asf-6.3.1.6\plugins" SkipUnchangedFiles="true" />
 		<Copy SourceFiles="@(ResourceDlls)" DestinationFiles="@(ResourceDlls->'..\ArchiSteamFarm\ArchiSteamFarm\bin\$(Configuration)\$(TargetFramework)\plugins\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 	</Target>
 
