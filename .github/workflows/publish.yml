@@ -5,20 +5,64 @@ on:
     tags:
       - "*"
 
+permissions:
+  contents: read
+
 env:
-  REPO_NAME: "ASFImportTools"
   PROJECT_NAME: "ASFImportTools"
+  REPO_NAME: "ASFImportTools"
   PLUGIN_NAME: "ASFImportTools.dll"
+  UI_NAME: "asf-import-tools"
   DOTNET_SDK_VERSION: 10.0
+  NODE_JS_VERSION: "lts/*"
 
 jobs:
-  build:
-    runs-on: windows-latest
+  publish-ui:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive
+
+      - name: Setup Node.js with npm
+        uses: actions/setup-node@v4.1.0
+        with:
+          check-latest: true
+          node-version: ${{ env.NODE_JS_VERSION }}
+
+      - name: Verify Node.js
+        run: node -v
+
+      - name: Verify npm
+        run: npm -v
+
+      - name: Install npm modules
+        run: npm ci --no-progress --prefix ${{ env.UI_NAME }}
+
+      - name: Publish ${{ env.UI_NAME }}
+        run: |
+          npm run-script generateInfo --no-progress --prefix ${{ env.UI_NAME }}
+          npm run-script build --no-progress --prefix ${{ env.UI_NAME }}
+
+      - name: Upload ${{ env.UI_NAME }}
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          if-no-files-found: error
+          name: plugin-ui
+          path: ${{ env.UI_NAME }}/build
+
+  publish-plugin:
+    needs: publish-ui
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           submodules: recursive
 
       - name: Setup .NET Core
@@ -35,6 +79,12 @@ jobs:
       - name: Publish ${{ env.PROJECT_NAME }}
         run: dotnet publish ${{ env.PROJECT_NAME }} -o:"./publish/" -c:Release
 
+      - name: Download previously built ASF-ui
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: plugin-ui
+          path: ./publish/ui
+
       - name: Collect files
         shell: pwsh
         run: |
@@ -46,6 +96,7 @@ jobs:
           }
 
           Copy-Item -Path .\publish\${{ env.PLUGIN_NAME }} -Destination .\tmp\ 
+          Copy-Item -Path .\publish\ui\* -Destination .\tmp\${{ env.PLUGIN_NAME }}.www -Recurse
 
           $dirs = Get-ChildItem -Path ./publish -Directory
           foreach ($dir in $dirs) {
@@ -77,12 +128,12 @@ jobs:
           path: ./dist/${{ env.PROJECT_NAME }}.zip
 
   release:
-    needs: build
+    needs: publish-plugin
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v3.1.0
 
       - name: Download ${{ env.PROJECT_NAME }} artifact from windows-latest
         uses: actions/download-artifact@v4.1.8
@@ -101,12 +152,10 @@ jobs:
           body: |
             ![Release](https://img.shields.io/badge/${{ env.REPO_NAME }}-${{ github.ref_name }}-brightgreen) ![Downloads](https://img.shields.io/github/downloads/chr233/${{ env.REPO_NAME }}/${{ github.ref_name }}/total?label=Downloads)
 
-            Help improve translation: [![Crowdin](https://badges.crowdin.net/asfenhance/localized.svg)](https://crowdin.com/project/asfenhance)
+            ---
+
+            前端入口 `http://localhost:1242/import` (假设 ASF IPC 接口在 http://localhost:1242)
 
             ---
 
-            release created by github actions
-
-            ---
-
-            前端入口 `http://localhost:1242` (假设 ASF IPC 接口在 http://localhost:1242)
+            release created bt github actions

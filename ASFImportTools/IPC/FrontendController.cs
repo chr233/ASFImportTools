@@ -10,77 +10,52 @@ namespace ASFImportTools.IPC;
 /// </summary>
 public sealed class FrontendController : ArchiController
 {
-    private static HttpClient? _httpClient;
+    private const string ApiUrl = "https://import.chrxw.com";
 
-    internal static void SetupApi()
+    [HttpGet("/123")]
+    public ActionResult Test()
     {
-        var apiUrl = new Uri("https://import.chrxw.com");
-
-        _httpClient = ASF.WebBrowser!.GenerateDisposableHttpClient(true);
-        _httpClient.BaseAddress = apiUrl;
-        _httpClient.Timeout = TimeSpan.FromSeconds(30);
+        string html = "<html><body><h1>Hello World</h1></body></html>";
+        return Content(html, "text/html");
     }
 
     /// <summary>
-    /// 
+    /// 获取页面
     /// </summary>
-    /// <param name="path"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private static async Task<string?> GetToString(string path, CancellationToken cancellationToken = default)
+    [HttpGet("/ImportGeneric")]
+    [EndpointSummary("ASFImportTools 前端, 仅限 Generic 版本")]
+    public async Task<ActionResult> Index()
     {
-        if (_httpClient == null)
+        if (ASF.WebBrowser == null)
         {
-            return null;
+            return Ok("内部错误");
+        }
+
+        if (!Config.EULA)
+        {
+            return Ok("请设置 ASFEnhance.EULA");
         }
 
         try
         {
-            var response = await _httpClient.GetAsync(path, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
+            var request = new Uri(ApiUrl);
+
+            var response = await ASF.WebBrowser.UrlGetToBinary(request).ConfigureAwait(false);
+            if (response?.Content == null || response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                return Ok("请求失败");
+            }
+
+            var bytes = response.Content.ToArray();
             var payload = System.Text.Encoding.UTF8.GetString(bytes);
-            return payload;
+            return Content(payload, "text/html; charset=utf-8");
         }
         catch (Exception ex)
         {
             ASFLogger.LogGenericWarningException(ex);
             ASFLogger.LogGenericError("Request failed");
-            return null;
+            return Ok(Langs.NetworkError);
         }
-    }
-
-    /// <summary>
-    /// 导入账号信息
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("/Import")]
-    [EndpointSummary("导入账号信息")]
-    public async Task<ActionResult> Index()
-    {
-        if (_httpClient == null)
-        {
-            return Ok("");
-        }
-
-        var response = await GetToString("/").ConfigureAwait(false);
-        if (!string.IsNullOrEmpty(response))
-        {
-            return Content(response, "text/html; charset=utf-8");
-        }
-        else
-        {
-            return BadRequest(Langs.NetworkError);
-        }
-    }
-
-    /// <summary>
-    /// 获取图标
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("/favicon.{extension:required}")]
-    public async Task<ActionResult> Favicon(string extension)
-    {
-        return RedirectPermanent($"https://import.chrxw.com/favicon.{extension}");
     }
 }

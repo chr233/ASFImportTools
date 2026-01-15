@@ -3,7 +3,6 @@ using ArchiSteamFarm.Helpers.Json;
 using ArchiSteamFarm.Plugins.Interfaces;
 using ArchiSteamFarm.Steam;
 using ASFImportTools.Data.Plugin;
-using ASFImportTools.IPC;
 using System.ComponentModel;
 using System.Composition;
 using System.Reflection;
@@ -13,7 +12,7 @@ using System.Text.Json;
 namespace ASFImportTools;
 
 [Export(typeof(IPlugin))]
-internal sealed class ASFImportTools : IASF, IBotCommand2, IGitHubPluginUpdates
+internal sealed class ASFImportTools : IASF, IBotCommand2, IGitHubPluginUpdates, IWebInterface
 {
     private const string ShortName = "AIT";
 
@@ -32,6 +31,10 @@ internal sealed class ASFImportTools : IASF, IBotCommand2, IGitHubPluginUpdates
 
     public bool CanUpdate => true;
     public string RepositoryName => "chr233/ASFImportTools";
+
+    public string PhysicalPath => "ASFImportTools.www";
+
+    public string WebPath => "/Import";
 
     /// <summary>
     /// ASF启动事件
@@ -77,10 +80,6 @@ internal sealed class ASFImportTools : IASF, IBotCommand2, IGitHubPluginUpdates
             sb.AppendLine(Langs.Line);
             sb.AppendLineFormat(Langs.EulaWarning, Name);
             sb.AppendLine(Langs.Line);
-        }
-        else
-        {
-            FrontendController.SetupApi();
         }
 
         if (sb.Length > 0)
