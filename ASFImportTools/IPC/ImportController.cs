@@ -12,7 +12,7 @@ namespace ASFImportTools.IPC;
 /// <summary>
 /// 测试相关接口
 /// </summary>
-[Route("/Api/Import")]
+[Route("/Api/[controller]/[action]")]
 public sealed class ImportController : ArchiController
 {
     /// <summary>

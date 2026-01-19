@@ -12,13 +12,6 @@ public sealed class FrontendController : ArchiController
 {
     private const string ApiUrl = "https://import.chrxw.com";
 
-    [HttpGet("/123")]
-    public ActionResult Test()
-    {
-        string html = "<html><body><h1>Hello World</h1></body></html>";
-        return Content(html, "text/html");
-    }
-
     /// <summary>
     /// 获取页面
     /// </summary>
